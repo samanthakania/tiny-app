@@ -16,11 +16,7 @@
 
 <body style="font-size:20px; padding:50px;">
     <% include ./partials/_header %>
-    <ul>
-      <% for (var url in urls) { %>
-       <li><a href="#"><%= urls[url] %></a></li>
-       <% } %>
-    </ul>
+      <%= shortURL %>:<a href="#"><%= longURL %></a>
 </body>
 
 </html>
