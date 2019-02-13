@@ -18,7 +18,7 @@
     <% include ./partials/_header %>
     <ul>
       <% for (var url in urls) { %>
-       <li><a href="#"><%= urls[url] %></a></li>
+       <li><b><%= url%>: </b></li><a href="#"><%= urls[url] %></a></li>
        <% } %>
     </ul>
 </body>
