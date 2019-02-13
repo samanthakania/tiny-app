@@ -1,3 +1,22 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
 <h1>TinyApp</h1>
 <a href=#>Create New TinyURL</a>
 <h3>My URLs</h3>
+
+<body>
+  <% if (username) {%>
+  <%= username %>
+  <form method="POST" action="/logout">
+    <button type="submit" class="btn btn-primary">Logout</button>
+  </form>
+  <% } else{ %>
+  <form method="POST" action="/login">
+    <button type="submit" class="btn btn-primary">Login</button>
+    <input type = "text" name = "username">
+  </form>
+  <% } %>
+</body>
+</html>
