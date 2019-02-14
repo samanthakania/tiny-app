@@ -7,16 +7,15 @@
 <h3>My URLs</h3>
 
 <body>
-  <% if (username) {%>
-  <%= username %>
-  <form method="POST" action="/logout">
+  <% if (users){ %>
+    <% (email === user.email) %>
+    <form method="POST" action="/logout">
     <button type="submit" class="btn btn-primary">Logout</button>
   </form>
-  <% } else{ %>
-  <form method="POST" action="/login">
-    <button type="submit" class="btn btn-primary">Login</button>
-    <input type = "text" name = "username">
-  </form>
+  <% } else {%>
+    <a href="/register">Register</a>
+    <a href="/login">Login</a>
   <% } %>
 </body>
+
 </html>
