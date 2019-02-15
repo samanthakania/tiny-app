@@ -44,7 +44,7 @@ function checkUser(email){
     }
   } return null
 }
-//URLS FUNCTION - adds url for specific logged-in user
+//URLS FUNCTION
 
 function urlsForUser(id){
   let userUrl = {};
@@ -74,8 +74,17 @@ app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
 
+//NEW URLS
+
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  let templateVars = {
+    user: users[req.cookies["user_id"]]
+  };
+  if (templateVars.user === undefined){
+    res.redirect("/login");
+  } else {
+  res.render("urls_new", templateVars);
+  }
 });
 
 app.get("/urls", (req, res) => {
@@ -107,10 +116,16 @@ app.get("/u/:shortURL", (req, res) => {
   res.redirect(longURL);
 });
 
+// DELETE
 app.post("/urls/:shortURL/delete", (req, res) => {
-  delete urlDatabase[req.params.shortURL];
+  delete urlDatabase[req.params.shortURL]
+  if (urlDatabase[req.params.shortURL].user === req.cookies.username){
+    delete urlDatabase[req.params.shortURL]
+    res.redirect("/urls");
+  } else {
+    res.redirect("/urls");
+  }
 
-  res.redirect("/urls");
 })
 
 app.post("/urls/:shortURL", (req, res) => {
