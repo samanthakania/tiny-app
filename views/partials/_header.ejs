@@ -3,19 +3,15 @@
 <html lang="en">
 
 <h1>TinyApp</h1>
-<a href=#>Create New TinyURL</a>
-<h3>My URLs</h3>
 
 <body>
-  <% if (users){ %>
-    <% (email === user.email) %>
-    <form method="POST" action="/logout">
-    <button type="submit" class="btn btn-primary">Logout</button>
-  </form>
-  <% } else {%>
-    <a href="/register">Register</a>
-    <a href="/login">Login</a>
-  <% } %>
-</body>
-
+  <%if(user){%>
+    <p>Welcome: <b><%=user.email%></b></p>
+    <form class="inline-form" method="POST" action='/logout'>
+      <button type="submit" class="btn btn-primary">Logout</button>
+    </form>
+    <%} else {%>
+    <div style="float: right; margin-right:2em;"><a href="/register">Register</a> | <a href="/login">Login</a></div>
+    <%}%>
 </html>
+

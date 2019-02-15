@@ -21,11 +21,30 @@ const users = {
     id: "user2RandomID",
     email: "user2@example.com",
     password: "dishwasher-funk"
-  }
+}
 };
 
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
+
+//function to generate random string:
+
+function generateRandomString() {
+  return Math.floor((1 + Math.random()) * 0x1000000).toString(16).substring(1);
+}
+
+generateRandomString();
+
+//Function to check if there's already an account
+
+function checkUser(email){
+  for (let user in users){
+    if (email === users[user].email){
+     return users[user]
+    }
+  } return null
+}
+
 
 app.get("/", (req, res) => {
   res.send("Hello!");
@@ -50,7 +69,7 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls", (req, res) => {
   let templateVars = {
     urls: urlDatabase,
-    users: users[req.cookies["user_id"]],
+    user: users[req.cookies["user_id"]],
  };
   res.render("urls_index", templateVars);
 });
@@ -59,7 +78,7 @@ app.get("/urls/:shortURL", (req, res) => {
   let templateVars = {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL],
-    users: users[req.cookies["user_id"]],
+    user: users[req.cookies["user_id"]],
   };
   res.render("urls_show", templateVars);
 });
@@ -70,11 +89,6 @@ app.post("/urls", (req, res) => {
   res.redirect("/urls");
 });
 
-function generateRandomString() {
-  return Math.floor((1 + Math.random()) * 0x1000000).toString(16).substring(1);
-}
-
-generateRandomString();
 
 app.get("/u/:shortURL", (req, res) => {
   const longURL = urlDatabase[req.params.shortURL]
@@ -110,63 +124,39 @@ app.post("/register", (req, res) => {
   let email = req.body.email;
   let password = req.body.password;
 
-  users[newUserId] = {
-    id: newUserId,
-    email: req.body.email,
-    password: req.body.password
-  };
-
   if (!email || !password){
     res.status(400).send("Please enter email and password.");
-    return
   };
 
-  for (let user in users)
-    if (email === users[user].email){
+  if (checkUser(email)){
     res.status(400).send("Email already in use.");
-    return
-  };
-
-  res.cookie("user_id", newUserId);
-  res.redirect("/urls");
+  } else if (checkUser(email) === null){
+      users[newUserId] = {
+      id: newUserId,
+      email: req.body.email,
+      password: req.body.password
+    };
+    res.cookie('user_id', users[newUserId].id);
+    res.redirect('/urls');
+  }
 })
 
-//login
+//LOGIN
 
 app.post("/login", (req, res) => {
+  let emailLogin = checkUser(req.body.email);
 
-  for (let i in users)
-    if (email !== users[i].email){
-    res.status(403).send("Email not found");
-    return
-  };
-
-    for (let i in users)
-    if (email === users[i].email){
-    res.status(403).send("Email not found");
-    return
-  };
-
-
-  if (!email || !password){
-    res.status(400).send("Please enter email and password.");
-    return
-  };
-
-  res.cookie("user_id", req.body.users);
-  res.redirect("/urls");
+  if (emailLogin && emailLogin.password === req.body.password){
+    res.cookie("user_id", emailLogin.id);
+    res.redirect("/urls");
+    return;
+  } else {
+    res.status(400).send("Invalid email or password.")
+  }
 })
 
 app.get("/login", (req, res) => {
   res.render("login")
 })
 
-function findEmail(email){
-  for (let i in users){
-    if (email === users[i].email){
-      return true
-    }
-  }
-}
 
-findEmail("user@example.com");
