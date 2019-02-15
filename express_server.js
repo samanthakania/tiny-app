@@ -6,9 +6,9 @@ var cookieParser = require('cookie-parser')
 app.use(cookieParser())
 app.set("view engine", "ejs");
 
-var urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+const urlDatabase = {
+  b6UTxQ: { longURL: "http://www.lighthouselabs.ca", userID: "b2xVn2" },
+  i3BoGr: { longURL: "http://www.google.com", userID: "9sm5xK" }
 };
 
 const users = {
@@ -44,7 +44,19 @@ function checkUser(email){
     }
   } return null
 }
+//URLS FUNCTION - adds url for specific logged-in user
 
+function urlsForUser(id){
+  let userUrl = {};
+    for (let i in urlDatabase){
+      if (urlDatabase[i].user === id){
+        id[i] = urlDatabase[i];
+      }
+    }
+    return id
+}
+
+//
 
 app.get("/", (req, res) => {
   res.send("Hello!");
@@ -113,7 +125,7 @@ app.post("/logout", (req, res) => {
   res.redirect("/urls");
 })
 
-//Register Page
+//REGISTER PAGE
 
 app.get("/register", (req, res) => {
   res.render("register")
@@ -141,7 +153,7 @@ app.post("/register", (req, res) => {
   }
 })
 
-//LOGIN
+//LOGIN PAGE
 
 app.post("/login", (req, res) => {
   let emailLogin = checkUser(req.body.email);
@@ -158,4 +170,5 @@ app.post("/login", (req, res) => {
 app.get("/login", (req, res) => {
   res.render("login")
 })
+
 
