@@ -50,10 +50,10 @@ function urlsForUser(id){
   let userUrl = {};
     for (let i in urlDatabase){
       if (urlDatabase[i].user === id){
-        id[i] = urlDatabase[i];
+        userUrl[i] = urlDatabase[i];
       }
     }
-    return id
+    return userUrl
 }
 
 //
@@ -89,7 +89,7 @@ app.get("/urls/new", (req, res) => {
 
 app.get("/urls", (req, res) => {
   let templateVars = {
-    urls: urlDatabase,
+    urls: urlsForUser(req.cookies.user),
     user: users[req.cookies["user_id"]],
  };
   res.render("urls_index", templateVars);
@@ -118,8 +118,8 @@ app.get("/u/:shortURL", (req, res) => {
 
 // DELETE
 app.post("/urls/:shortURL/delete", (req, res) => {
-  delete urlDatabase[req.params.shortURL]
-  if (urlDatabase[req.params.shortURL].user === req.cookies.username){
+
+  if (urlDatabase[req.params.shortURL].user === req.cookies.user_id){
     delete urlDatabase[req.params.shortURL]
     res.redirect("/urls");
   } else {
