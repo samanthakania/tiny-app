@@ -16,10 +16,13 @@
 
 <body style="font-size:20px; padding:50px;">
     <header><% include ./partials/_header %></header>
-    <%= shortURL %>:<a href="#"><%= longURL %></a>
+
+    <h2>Short URL: <%= shortURL %></h2>
+
+    <a href="#"><%= longURL %></a>
     <form method="POST" action="/urls/<%=shortURL%>">
-    <input class="form-control" type="text" name="longURL" placeholder="http://" style="width: 300px; margin: 1em">
-    <button type="submit" class="btn btn-primary">Submit</button>
+    <input class="form-control" type="text" name="longURL" placeholder="Add URL" style="width: 300px; margin: 1em">
+    <button type="submit" class="btn btn-primary">Edit</button>
     </form>
 
 </body>

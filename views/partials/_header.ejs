@@ -7,9 +7,11 @@
 <body>
   <%if(user){%>
     <p>Welcome: <b><%=user.email%></b></p>
+
     <form class="inline-form" method="POST" action='/logout'>
       <button type="submit" class="btn btn-primary">Logout</button>
     </form>
+
     <%} else {%>
     <a href="/register">Register</a> | <a href="/login">Login</a></div>
     <%}%>

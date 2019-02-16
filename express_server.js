@@ -10,7 +10,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
 app.use(cookieSession({
   name: 'session',
-  keys: [123456],
+  keys: ['123456'],
 }));
 
 const urlDatabase = {
@@ -54,11 +54,11 @@ function checkUser(email){
 function urlsForUser(id){
   let userUrl = {};
     for (let i in urlDatabase){
-      if (urlDatabase[i].user === id){
+      if (urlDatabase[i].userID === id){
         userUrl[i] = urlDatabase[i];
       }
     }
-    return userUrl
+    return userUrl;
 }
 
 //PORT
@@ -82,39 +82,39 @@ app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
 
-//URLS
-app.get("/urls", (req, res) => {
-  let templateVars = {
-    urls: urlsForUser(req.session.user),
-    user: users[req.session.user_id],
- };
-  res.render("urls_index", templateVars);
-});
-
+//URLS PAGE
 app.post("/urls", (req, res) => {
-  if (req.session.user_id === undefined){
+  if (req.session.id === undefined){
     res.redirect('/urls');
-  } else{
+  } else {
     var randomURL = generateRandomString();
     urlDatabase[randomURL] = {
       url: req.body["longURL"],
-      user: req.session.user
+      user: req.session.id
     };
   }
   res.redirect(`"/urls/${randomURL}`);
 });
 
+app.get("/urls", (req, res) => {
+  let templateVars = {
+    urls: urlsForUser(req.session.id),
+    user: users[req.session.id],
+ };
+  res.render("urls_index", templateVars);
+});
+
+
 
 //NEW URLS
 app.get("/urls/new", (req, res) => {
   let templateVars = {
-    user: users[req.session.user_id],
-    urls: urlsForUser(req.session.user),
+    user: users[req.session.id],
+    urls: urlsForUser(req.session.id),
   };
   if (templateVars.user === undefined){
     res.redirect("/login");
-    console.log("Please login.")
-  } else {
+    } else {
   res.render("urls_new", templateVars);
   }
 });
@@ -125,33 +125,36 @@ app.get("/urls/:shortURL", (req, res) => {
   let templateVars = {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL],
-    user: users[req.session.user_id],
+    user: users[req.session.id],
   };
-  res.render("urls_show", templateVars);
+    if(users[req.session.id]){
+        res.render("urls_show", templateVars);
+    } else {
+      res.redirect("/login");
+    }
 });
 
 app.get("/u/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL]
-  res.redirect(longURL);
+  if (req.params.shortURL in urlDatabase){
+    res.redirect(urlDatabase[req.params.shortURL].longURL);
+  } else {
+    res.status(400).send("Please login.")
+  }
 });
+
 
 // DELETE
 app.post("/urls/:shortURL/delete", (req, res) => {
-
-  if (urlDatabase[req.params.shortURL].user === req.session.user_id){
+  if (urlDatabase[req.params.shortURL].user === req.session.id){
     delete urlDatabase[req.params.shortURL]
     res.redirect("/urls");
   } else {
-    res.redirect("/urls");
+    res.redirect("/login");
   }
 
 });
 
-app.post("/urls/:shortURL", (req, res) => {
-  urlDatabase[req.params.shortURL] = req.body["longURL"];
 
-  res.redirect("/urls");
-});
 
 //REGISTER PAGE
 
@@ -165,16 +168,18 @@ app.post("/register", (req, res) => {
 
   if (!email || !password){
     res.status(400).send("Please enter email and password.");
+    return;
   } else if (checkUser(email)){
     res.status(400).send("Email already in use.");
+    return;
   } else {
       let newUserId = generateRandomString();
       users[newUserId] = {
         id: newUserId,
         email: req.body.email,
-        password: bcrypt.hashSync(req.body.password, 10)
-      };
-    res.session.user_id = newUserId;
+        password: bcrypt.hashSync(password, 10)
+      }
+    res.session["id"] = newUserId;
     res.redirect('/urls');
   }
   });
@@ -184,7 +189,7 @@ app.post("/register", (req, res) => {
 app.post("/login", (req, res) => {
   let emailLogin = checkUser(req.body.email);
   if (emailLogin && emailLogin.password === req.body.password){
-    req.session.user_id = emailLogin.id;
+    req.session.id = emailLogin.id;
     res.redirect("/urls");
     return;
   } else {
@@ -193,7 +198,7 @@ app.post("/login", (req, res) => {
 });
 
 app.get("/login", (req, res) => {
-  res.render("login")
+  res.render("/login")
 });
 
 //LOGOUT
