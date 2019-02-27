@@ -15,17 +15,17 @@ app.use(cookieSession({
 }));
 
 const urlDatabase = {
-  b6UTxQ: { longURL: "http://www.lighthouselabs.ca", userID: "b2xVn2" },
-  i3BoGr: { longURL: "http://www.google.com", userID: "9sm5xK" },
-  b6UTxQ: { longURL: "http://www.linkedin.ca", userID: "userRandomID" },
-  i3BoGr: { longURL: "http://www.facebook.com", userID: "userRandomID" },
-  b6UTxQ: { longURL: "http://www.gmail.ca", userID: "user2RandomID" },
-  i3BoGr: { longURL: "http://www.amazon.com", userID: "user2RandomID" }
+  b6UTxQ: { longURL: "http://www.lighthouselabs.ca", userID: "userRandomID" },
+  i3Basd: { longURL: "http://www.google.com", userID: "userRandomID" },
+  b6UTqQ: { longURL: "http://www.linkedin.ca", userID: "userRandomID" },
+  i3woGr: { longURL: "http://www.facebook.com", userID: "userRandomID" },
+  berTxQ: { longURL: "http://www.gmail.ca", userID: "user2RandomID" },
+  i3B7Gr: { longURL: "http://www.amazon.com", userID: "user2RandomID" }
 };
 
 const users = {
   "userRandomID": {
-    id: "sam",
+    id: "userRandomID",
     email: "user@example.com",
     password: "123456"
   },
@@ -58,17 +58,13 @@ function checkUser(email){
 //URLS FUNCTION
 
 function urlsForUser(id){
-  console.log('id',id);
   const userUrl = {};
-  for (let i in urlDatabase){
-    console.log('i value', i);
-    console.log("check", urlDatabase[i].userID, id);
-    if (urlDatabase[i]['userID'] == id){
-      console.log(i);
-      userUrl[i] = urlDatabase[i];
+  for (let shortURL in urlDatabase) {
+    if (urlDatabase[shortURL]['userID'] === id) {
+      userUrl[shortURL] = urlDatabase[shortURL];
     }
   }
-    return userUrl;
+  return userUrl;
 }
 
 //
@@ -93,7 +89,7 @@ app.post("/urls", (req, res) => {
   } else {
     var randomURL = generateRandomString();
     urlDatabase[randomURL] = {
-      url: req.body["longURL"],
+      longURL: req.body["longURL"],
       userID: req.session.id
     };
   }
@@ -105,8 +101,6 @@ app.get("/urls", (req, res) => {
     urls: urlsForUser(req.session.id),
     user: users[req.session.id],
  };
- console.log(templateVars.urls);
- console.log(templateVars.user);
   res.render("urls_index", templateVars);
 });
 
@@ -151,13 +145,12 @@ app.get("/u/:shortURL", (req, res) => {
 
 // DELETE
 app.post("/urls/:shortURL/delete", (req, res) => {
-  if (urlDatabase[req.params.shortURL].user === req.session.id){
+  if (urlDatabase[req.params.shortURL].userID === req.session.id){
     delete urlDatabase[req.params.shortURL]
     res.redirect("/urls");
   } else {
     res.redirect("/login");
   }
-
 });
 
 //REGISTER PAGE
@@ -192,7 +185,7 @@ app.post("/register", (req, res) => {
 
 app.post("/login", (req, res) => {
   let emailLogin = checkUser(req.body.email);
-  if (emailLogin && emailLogin.password === req.body.password){
+  if (emailLogin && emailLogin.password === req.body.password) {
     req.session.id = emailLogin.id;
     res.redirect("/urls");
     return;

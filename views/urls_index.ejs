@@ -15,16 +15,16 @@
 </head>
 
 <body style="font-size:20px; padding:50px;">
+    <body style="font-size:20px; padding:50px;">
     <% include ./partials/_header %>
     <ul>
-      <% for (var url in urls) { %>
-      <li><%= url %>: <a href='<%= url %>'> <%= url %></a>
-
-      <form method="POST" action="/urls/<%=url%>/delete">
-      <li><%= url%>:</li><a href="#"><%= url %></a></li>
-      <button type="submit" value="delete" class="btn btn-primary">Delete</button>
+      <% for (var shortURL in urls) { %>
+      <li><%= shortURL %>: <a href='/u/<%= shortURL %>'> <%= urls[shortURL].longURL %></a>
+        <form method="POST" action="/urls/<%=shortURL%>/delete">
+          <button type="submit" value="delete" class="btn btn-primary">Delete</button>
+        </form>
+      </li>
       <% } %>
-    </form>
     </ul>
 </body>
 
