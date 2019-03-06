@@ -36,7 +36,7 @@ const users = {
 }
 };
 
-
+//Helper Functions
 //function to generate random string:
 
 function generateRandomString() {
@@ -206,8 +206,31 @@ app.post("/logout", (req, res) => {
   res.redirect("/urls");
 });
 
+//EDIT URL
+
+app.get('/urls/:shortURL', (req, res) => {
+  if (req.session.id && urlDatabase[req.params.shortURL].userID === req.session.id) {
+    const templateVars = {
+      shortURL: req.params.shortURL,
+      longURL: urlDatabase[req.params.shortURL].longURL,
+      user: users[req.session.id],
+    };
+    res.render("urls_show", templateVars);
+  } else {
+    res.redirect("/login")
+  }
+});
+
+app.post('/urls/:shortURL', (req, res) => {
+  urlDatabase[req.params.shortURL].longURL = req.body["longURL"];
+  res.redirect('/urls')
+});
+
 //PORT
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
+
+
+

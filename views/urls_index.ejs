@@ -17,11 +17,16 @@
 <body style="font-size:20px; padding:50px;">
     <body style="font-size:20px; padding:50px;">
     <% include ./partials/_header %>
-    <ul>
+     <h1>URLs</h1>
+    <a href="/urls/new">Create a New Short URL</a>
+      <ul>
       <% for (var shortURL in urls) { %>
-      <li><%= shortURL %>: <a href='/u/<%= shortURL %>'> <%= urls[shortURL].longURL %></a>
+      <li><a href='/u/<%= shortURL %>'><%= shortURL %></a>:  <%= urls[shortURL].longURL %>
         <form method="POST" action="/urls/<%=shortURL%>/delete">
           <button type="submit" value="delete" class="btn btn-primary">Delete</button>
+        </form>
+        <form method="POST" action="">
+          <button type="submit" value="edit" class="btn btn-primary">Edit</button>
         </form>
       </li>
       <% } %>
