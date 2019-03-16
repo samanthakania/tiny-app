@@ -27,12 +27,12 @@ const users = {
   "userRandomID": {
     id: "userRandomID",
     email: "user@example.com",
-    password: "123456"
+    password: bcrypt.hashSync("123456", 10)
   },
  "user2RandomID": {
     id: "user2RandomID",
     email: "user2@example.com",
-    password: "dishwasher-funk"
+    password: bcrypt.hashSync("dishwasher-funk", 10)
 }
 };
 
@@ -47,10 +47,11 @@ generateRandomString();
 
 //Function to check if there's already an account
 
-function checkUser(email){
+function checkUser(email, password){
   for (let user in users){
-    if (email === users[user].email){
-     return users[user]
+    if (email === users[user].email &&
+      bcrypt.compareSync(password, users[user].password)){
+     return user;
     }
   } return null
 }
@@ -162,35 +163,45 @@ app.get("/register", (req, res) => {
 app.post("/register", (req, res) => {
   let email = req.body.email;
   let password = req.body.password;
+  let newUserId = generateRandomString();
 
-  if (!email || !password){
-    res.status(400).send("Please enter email and password.");
-    return;
-  } else if (checkUser(email)){
-    res.status(400).send("Email already in use.");
-    return;
-  } else {
-      let newUserId = generateRandomString();
-      users[newUserId] = {
-        id: newUserId,
-        email: req.body.email,
-        password: bcrypt.hashSync(password, 10)
-      }
-    req.session.id = newUserId;
-    res.redirect('/urls');
+//check user email and password
+  for (let user in users){
+    if (email === users[user].email){
+      res.status(400).send("Email already in use.");
+      return;
+    }
   }
+  if (!email || !password){
+      res.status(400).send("Please enter email and password.");
+      return;
+    }
+//new user
+  let hashedPassword = bcrypt.hashSync(password, 10);
+    users[newUserId] = {
+      id: newUserId,
+      email: email,
+      password: hashedPassword
+    }
+  req.session.id = newUserId;
+  res.redirect('/urls');
   });
 
 //LOGIN PAGE
 
 app.post("/login", (req, res) => {
-  let emailLogin = checkUser(req.body.email);
-  if (emailLogin && emailLogin.password === req.body.password) {
-    req.session.id = emailLogin.id;
-    res.redirect("/urls");
-    return;
-  } else {
+  let email = req.body.email;
+  let password = req.body.password;
+  if (!email || !password) {
     res.status(400).send("Invalid email or password.")
+  } else {
+    let userId = checkUser(email, password);
+    if (!userId){
+      res.status(400).send("Invalid email or password.")
+    } else {
+    req.session.id = userId;
+    res.redirect("/urls");
+    }
   }
 });
 
