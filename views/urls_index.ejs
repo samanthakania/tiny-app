@@ -21,14 +21,13 @@
     <a href="/urls/new">Create a New Short URL</a>
       <ul>
       <% for (var shortURL in urls) { %>
-      <li><a href='/u/<%= shortURL %>'><%= shortURL %></a>:  <%= urls[shortURL].longURL %>
+      <a href='/u/<%= shortURL %>'><%= shortURL %></a>:  <%= urls[shortURL].longURL %>
         <form method="POST" action="/urls/<%=shortURL%>/delete">
           <button type="submit" value="delete" class="btn btn-primary">Delete</button>
         </form>
-        <form method="POST" action="">
+        <form method="GET" action="/urls/<%=shortURL%>">
           <button type="submit" value="edit" class="btn btn-primary">Edit</button>
         </form>
-      </li>
       <% } %>
     </ul>
 </body>
